@@ -1413,6 +1413,76 @@
     }
   }
 </style>
+<style id="haotian-fix-v2">
+  /* 皓天修正 v2：還原真實瀏覽用的版面（取代截圖專用設定） */
+  body { padding-bottom: 86px !important; }
+  .mobile-cart-bar { display: block !important; }
+  #app-toast { display: block !important; z-index: 120 !important; }
+  #catalog-section .product-card:nth-child(3),
+  #catalog-section .product-card:nth-child(4),
+  #catalog-section .product-card:nth-child(5),
+  #catalog-section .product-card:nth-child(6) { margin-bottom: 0 !important; }
+  .main-nav { min-width: 0 !important; }
+  .hud-pill:focus-visible, .nav-btn:focus-visible { outline: 2px solid var(--accent-cream-gold); outline-offset: 2px; }
+
+  /* 頁首：寬螢幕單列；中等寬度（769–1199px）改兩列，導覽可橫向捲動，不再與店名重疊 */
+  @media (min-width: 769px) {
+    .site-header, #site-header { position: sticky !important; top: 0 !important; }
+    .brand-block { flex: 0 0 auto !important; }
+    .brand-sub { max-width: none !important; }
+    .main-nav { flex: 1 1 auto !important; overflow-x: auto !important; justify-content: center; }
+  }
+  @media (min-width: 769px) and (max-width: 1199px) {
+    .header-inner { flex-wrap: wrap !important; row-gap: 6px !important; }
+    .main-nav {
+      order: 3 !important; flex: 0 0 100% !important; width: 100% !important;
+      justify-content: flex-start; flex-wrap: nowrap !important;
+      padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.06);
+    }
+  }
+
+  /* 3D 舞台（769px 以上）：恢復「往下捲動切換五站」— 舞台固定在畫面上，捲動推進站點 */
+  @media (min-width: 769px) {
+    .world-stage {
+      height: calc(100vh - var(--header-offset) + 4 * 60vh) !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    .world-sticky {
+      position: sticky !important;
+      top: var(--header-offset) !important;
+      height: calc(100vh - var(--header-offset)) !important;
+      min-height: 0 !important;
+      max-height: none !important;
+    }
+    .world-narrative {
+      position: sticky !important;
+      top: var(--header-offset) !important;
+      margin-top: calc(-100vh + var(--header-offset)) !important;
+      height: calc(100vh - var(--header-offset)) !important;
+    }
+    .story-step.is-active {
+      min-height: 0 !important;
+      height: 100% !important;
+      padding-top: 56px !important;
+    }
+    .world-progress {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 4px; z-index: 16;
+      background: rgba(255,255,255,0.12);
+    }
+    .world-progress > i { display: block; height: 100%; width: 20%; background: var(--accent-cream-gold); transition: width 0.3s ease; }
+    .world-scroll-hint {
+      position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 16;
+      font-size: 0.74rem; font-weight: 700; color: rgba(248,250,252,0.86);
+      background: rgba(11,17,32,0.7); padding: 4px 12px; border-radius: 999px; pointer-events: none;
+    }
+  }
+  @media (max-width: 768px) {
+    .world-progress, .world-scroll-hint { display: none !important; }
+    .world-stage { min-height: 0 !important; }
+    .main-nav { flex-wrap: nowrap !important; overflow-x: auto !important; }
+  }
+</style>
 </head>
 <body>
 
@@ -1447,13 +1517,15 @@
     <section class="world-stage" id="world-stage" aria-label="阿姑的店五站八德路82巷透明貼膜微縮世界">
       <div class="world-sticky">
         <div class="world-hud" role="tablist" aria-label="微縮島嶼站點切換">
-          <button type="button" class="hud-pill is-active" data-station="0">01 八德82巷透明門市</button>
-          <button type="button" class="hud-pill" data-station="1">02 9H金剛光學實驗室</button>
-          <button type="button" class="hud-pill" data-station="2">03 無塵雷射對位工坊</button>
-          <button type="button" class="hud-pill" data-station="3">04 全家十機防摔陳列島</button>
-          <button type="button" class="hud-pill" data-station="4">05 30天門市服務與快取中心</button>
+          <button type="button" class="hud-pill is-active" role="tab" aria-selected="true" data-station="0">01 八德82巷透明門市</button>
+          <button type="button" class="hud-pill" role="tab" aria-selected="false" data-station="1">02 9H金剛光學實驗室</button>
+          <button type="button" class="hud-pill" role="tab" aria-selected="false" data-station="2">03 無塵雷射對位工坊</button>
+          <button type="button" class="hud-pill" role="tab" aria-selected="false" data-station="3">04 全家十機防摔陳列島</button>
+          <button type="button" class="hud-pill" role="tab" aria-selected="false" data-station="4">05 30天門市服務與快取中心</button>
         </div>
 
+        <div class="world-progress" aria-hidden="true"><i id="world-progress-fill"></i></div>
+        <div class="world-scroll-hint" id="world-scroll-hint" aria-hidden="true">往下捲動或點上方站點，切換五站場景</div>
         <div class="scene-layer is-active" data-scene="0">
           <img src="./assets/scene-01.webp" alt="台北市中正區八德路一段82巷5號阿姑的店透明標價與30天門市服務微縮門市" class="scene-img" fetchpriority="high">
           <div class="scene-scrim"></div>
@@ -1989,7 +2061,7 @@
             </div>
             <div class="form-field">
               <label class="form-label" for="buyer-phone">聯絡手機（作為 30 天電子門市服務查詢號碼）</label>
-              <input type="tel" id="buyer-phone" class="form-input num" placeholder="（示範介面不提供展示模式：線上示意示範
+              <input type="tel" id="buyer-phone" class="form-input num" placeholder="示範介面，請勿填寫真實號碼">
             </div>
             <div class="form-field">
               <label class="form-label" for="buyer-taxid">買方展示編號（選填，公司公務機報帳用）</label>
@@ -2027,8 +2099,8 @@
             <strong style="font-size:0.8rem; color:var(--accent-teal); text-align:right;" id="sum-ext">八德 82 巷 5 號一號無塵工作台</strong>
           </div>
           <div class="summary-row">
-            <span>門市服務與示範模式說明</span>
-            <span class="num" style="font-size:0.8rem; font-weight:700;" id="sum-展示模式：線上示意示範</span>
+            <span>示範模式說明</span>
+            <span class="num" style="font-size:0.8rem; font-weight:700;" id="sum-note">示範介面，僅保留門市地點</span>
           </div>
           <div class="summary-row">
             <span>售後門市服務承諾</span>
@@ -2207,8 +2279,8 @@
     (function () {
       const PRODUCTS = [{"id": "AGU-01", "name": "【頂規金剛滿版】二次強化 9H 鑽石級抗摔玻璃保護貼（含 30 天破膜免費換新門市服務）", "shortName": "頂規 9H 金剛滿版保護貼（含30天門市服務）", "category": "protector", "categoryLabel": "9H 金剛保護貼與滿版貼膜", "material": "日本 AGC 高鋁玻璃 × 台灣特殊光學膠 × 115° 電鍍奈米疏油層", "spec": "公開透明 5 層結構與 64g 鋼球落錘實測！到店無塵室免費代貼，享 30 天內碎邊或破膜免費換新 1 次門市服務", "badge": "30天破膜免費換新", "price": 980, "origPrice": 1200, "isMultiBundle": false, "keywords": "金剛保護貼 9H 滿版 玻璃貼 抗摔 門市服務 iPhone 17 16 Pro Max 無塵室 1000元透明升級", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-02", "name": "【28° 雙向防窺／抗藍光】標準製程批次管理 護眼防窺 9H 滿版鋼化玻璃貼（含雷射對位代貼）", "shortName": "28° 防窺抗藍光 9H 滿版玻璃貼", "category": "protector", "categoryLabel": "9H 金剛保護貼與滿版貼膜", "material": "LG 光學防窺百葉塗層 × 抗藍光濾光基材 × 二次強化導角邊", "spec": "正面高透不暈眩、左右 28° 物理防偷窺，完美支援 Face ID 與螢幕下指紋秒解，附 30 天門市服務", "badge": "通勤防窺人氣王", "price": 690, "origPrice": 890, "isMultiBundle": false, "keywords": "防窺 抗藍光 護眼 保護貼 玻璃貼 9H 捷運通勤 iPhone Samsung Pixel", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-03", "name": "【大曲面／旗艦專用】UV 光學全膠貼合滿版鋼化膜（含無塵 UV 固膠工藝）", "shortName": "大曲面 UV 光學全膠滿版鋼化膜", "category": "protector", "categoryLabel": "9H 金剛保護貼與滿版貼膜", "material": "台灣大廠特殊光學膠 × 全透明無黑邊曲面鋼化玻璃", "spec": "專治大曲面螢幕邊緣翹起與觸控不靈敏！不擋邊遮字、微刮痕光學填補，支援超聲波指紋秒解", "badge": "曲面螢幕救星", "price": 850, "origPrice": 1080, "isMultiBundle": false, "keywords": "曲面 UV 全膠 光學膠 指紋解鎖 Pixel Pro XL Samsung Ultra 滿版保護貼", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-04", "name": "【小資透明標準版】高清高透 9H 滿版鋼化玻璃保護貼（含到店專業除塵代貼）", "shortName": "標準高清 9H 滿版玻璃保護貼", "category": "protector", "categoryLabel": "9H 金剛保護貼與滿版貼膜", "material": "高透光 9H 鋼化玻璃 × 真空疏水疏油塗層", "spec": "公開透明入門價！北科大學生與八德商圈上班族日常換膜首選，連工帶料現場 10 分鐘快速完工", "badge": "學生小資首選", "price": 390, "origPrice": 490, "isMultiBundle": false, "keywords": "標準 便宜 平價 高清 9H 玻璃貼 保護貼 北科大 光華商場 390元", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-05", "name": "【MagSafe 氣囊防摔】四角隱形氣囊抗黃透明磁吸防摔手機殼（全機型現貨）", "shortName": "MagSafe 四角氣囊抗黃透明防摔殼", "category": "phonecase", "categoryLabel": "軍規防摔手機殼系列", "material": "德國拜耳抗黃 TPU 減震邊框 ＋ 高透抗刮 PC 背板 ＋ N52 強磁環", "spec": "四角雙重氣囊結構通過 2.4 公尺防摔測試，精準內縮不頂滿版保護貼，還原裸機原色", "badge": "熟客回購職人經典", "price": 590, "origPrice": 750, "isMultiBundle": false, "keywords": "手機殼 透明殼 防摔殼 MagSafe 磁吸 抗黃 氣囊 iPhone 17 16 15", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-06", "name": "【軍規極盾防摔】霧面防指紋 MagSafe 雙料複合軍規防摔殼（附金屬獨立按鍵）", "shortName": "軍規極盾霧面 MagSafe 防摔手機殼", "category": "phonecase", "categoryLabel": "軍規防摔手機殼系列", "material": "內層蜂巢緩震結構 ＋ 親膚霧面抗指紋背板 ＋ 鋁合金按鍵", "spec": "鏡頭框與螢幕邊緣加高 1.5mm，提供曜石黑、原色鈦灰、暗夜綠、深海藍四色，手感俐落不沾油汙", "badge": "軍規防摔認證", "price": 790, "origPrice": 980, "isMultiBundle": false, "keywords": "軍規防摔殼 霧面 手機殼 MagSafe 防指紋 金屬按鍵 鈦灰 曜石黑", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-07", "name": "【孝親商務首選】經典磁扣翻蓋防摔皮套手機殼（內建悠遊卡槽＋追劇立架）", "shortName": "經典磁扣翻蓋防摔皮套手機殼", "category": "phonecase", "categoryLabel": "軍規防摔手機殼系列", "material": "耐磨防潑水十字紋 PU 皮革 ＋ 柔軟 TPU 全包覆防摔內殼", "spec": "360 度全機前後完整包覆不怕鑰匙刮傷，內置雙卡槽與鈔票夾層，長輩與業務拜訪最實用", "badge": "長輩孝親熱銷", "price": 490, "origPrice": 650, "isMultiBundle": false, "keywords": "皮套 翻蓋 掀蓋 手機殼 長輩 孝親 悠遊卡 立架 防摔", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-08", "name": "【熟客激推平板套】iPad 磁吸三折筆槽氣囊防彎保護套（適用 iPad 全系列）", "shortName": "iPad 磁吸三折筆槽防彎保護套", "category": "ipad_lens", "categoryLabel": "iPad 平板套與藍寶石鏡頭貼", "material": "高韌性防彎亞克力背板 ＋ 蜂巢散熱導槽 ＋ 智能磁吸休眠上蓋", "spec": "支援 Apple Pencil 磁吸充電與收納，30° 繪圖打字與 65° 影音追劇雙角度穩固支撐", "badge": "平板必備首選", "price": 680, "origPrice": 880, "isMultiBundle": false, "keywords": "平板殼 平板套 iPad Air Pro mini 保護殼 筆槽 三折 防彎", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-09", "name": "【iPad 繪圖寫字】日本肯特紙感類紙膜／9H 高清平板玻璃貼（含無塵代貼）", "shortName": "iPad 日本肯特紙感類紙膜／玻璃貼", "category": "ipad_lens", "categoryLabel": "iPad 平板套與藍寶石鏡頭貼", "material": "日本進口肯特紙紋理基材 ／ 9H 抗指紋鋼化玻璃（二選一）", "spec": "專為筆記與電繪設計，筆尖阻尼感自然不打滑、抗眩光不傷眼；亦可任選高清 9H 玻璃貼", "badge": "筆記電繪神物", "price": 650, "origPrice": 850, "isMultiBundle": false, "keywords": "iPad 類紙膜 肯特紙 平板保護貼 繪圖 Apple Pencil 鋼化膜", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-10", "name": "【藍寶石光學防護】AR 抗反射鍍膜金屬框單顆獨立鏡頭保護貼（一組 3 顆入）", "shortName": "AR 抗反射藍寶石級獨立鏡頭貼組", "category": "ipad_lens", "categoryLabel": "iPad 平板套與藍寶石鏡頭貼", "material": "高硬度光學玻璃 ＋ AR 抗反射增透鍍膜 ＋ 航太鋁合金原機色邊框", "spec": "99% 原機透光率、開閃光燈夜拍零白霧眩光，搭配保護殼完全不卡框，湊滿千元免運首選", "badge": "夜拍不眩光", "price": 450, "origPrice": 590, "isMultiBundle": false, "keywords": "鏡頭貼 鏡頭環 藍寶石 AR 抗反射 iPhone Pro Max 湊免運", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-11", "name": "【雙機新機全配免運組】頂規金剛滿版貼 × 2 ＋ MagSafe 防摔殼 × 2（含雙機 30 天門市服務）", "shortName": "雙機新機全配組（2金剛貼＋2防摔殼）", "category": "bundle", "categoryLabel": "家庭十機與企業團購特惠組", "material": "頂規二次強化金剛貼 × 2 片 ＋ MagSafe 氣囊／極盾防摔殼 × 2 個", "spec": "夫妻情侶換新機一次到位！單組現省 NT$800 並直接享台灣免運與雙機 30 天破膜免費換新門市服務", "badge": "單組直享免運", "price": 2680, "origPrice": 3480, "isMultiBundle": true, "keywords": "雙機 套餐 組合 免運 金剛貼 防摔殼 情侶 換機 優惠", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}, {"id": "AGU-12", "name": "【八德熟客鎮店組】全家 10 隻手機殼 ＋ 1 隻 iPad 平板殼大滿貫家庭包（74 折特惠）", "shortName": "熟客鎮店組：10隻手機殼＋1隻平板殼", "category": "bundle", "categoryLabel": "家庭十機與企業團購特惠組", "material": "任選型號防摔手機殼 × 10 個 ＋ iPad 三折氣囊保護套 × 1 個", "spec": "源自 Google 評論真實熟客口碑『我們家的十隻手機殼、一隻平板殼都在這裡買』！跨型號任選現省 NT$1,700", "badge": "真實熟客口碑74折", "price": 4880, "origPrice": 6580, "isMultiBundle": true, "keywords": "十隻手機殼 一隻平板殼 家庭團購 企業公務機 批發 熟客推薦 阿姑的店", "url": "https://www.google.com/maps/place/%E9%98%BF%E5%A7%91%E7%9A%84%E5%BA%97/@25.0436932,121.5292443,17z/data=!4m6!3m5!1s0x3442a9ccdfee3cb1:0xe311242923c0098d!8m2!3d25.0436932!4d121.5318192!16s%2Fg%2F11s558fzw2"}];
       const SHIPPING_MODES = [{"id": "bade_pickup", "label": "八德路一段 82 巷 5 號門市快取／現場無塵室免費代貼（免運費）", "threshold": 0, "fee": 0, "intl": false, "eta": "線上預約時段，到店 15 分鐘內完成無塵貼膜與取件"}, {"id": "cvs", "label": "超商取貨（7-11／全家，附 DIY 無塵貼膜神器盒）", "threshold": 1000, "fee": 60, "intl": false, "eta": "滿 NT$1,000 免運，現貨 24 小時內寄出（約 2–3 天到店）"}, {"id": "tw_home", "label": "台灣本島宅配（示範展間／順豐防撞盒裝寄送）", "threshold": 1000, "fee": 90, "intl": false, "eta": "滿 NT$1,000 免運，出貨後約 1–2 個工作天送達"}, {"id": "corp_batch", "label": "大台北企業公務機／學校機關專人到府收送貼膜（滿 10 台起）", "threshold": 4000, "fee": 150, "intl": false, "eta": "滿 NT$4,000 免收外勤車馬費，支援開立報帳憑證"}];
-      const B2B_TRACKS = [{"id": "personal_pickup", "label": "個人／學生線上透明估價・預約八德 82 巷門市現場貼膜（含 30 天門市服務）", "ext": "八德 82 巷 5 號一號無塵工作台", "email": "（示範介面不顯示示範模式說明）"}, {"id": "family_10case", "label": "家庭多機團購專案（如：10 隻手機殼＋1 隻平板殼跨機型混搭 74 折）", "ext": "阿姑店長熟客示範模式說明櫃台", "email": "（示範介面不顯示示範模式說明）"}, {"id": "warranty_claim", "label": "30 天碎邊／破膜免費換新門市服務與爭議優先處理通道", "ext": "數位展示架構監理門市服務專責組", "email": "（示範介面不顯示示範模式說明）"}, {"id": "corp_b2b", "label": "企業公務機／北科大實驗室／補習班平板大宗採購與防窺膜專案", "ext": "B2B 企業商務示範模式說明", "email": "（示範介面不顯示示範模式說明）"}];
-      const UCP_TEXT = "{\n  \"ucp_version\": \"1.0\",\n  \"merchant\": {\n    \"id\": \"tw-bade82-agushop\",\n    \"brand_name\": \"阿姑的店 AGU 3C 職人貼膜・防護專門店（台北八德光華店）\",\n    \"place_id\": \"ChIJsTzu38ypQjQRjQnAIykkEeM\",\n    \"google_maps_cid\": \"0x3442a9ccdfee3cb1:0xe311242923c0098d\",\n    \"address\": \"100臺北市中正區梅花里八德路一段82巷5號\",\n    \"coordinates\": {\n      \"lat\": 25.0436932,\n      \"lng\": 121.5318192\n    },\n    \"district_context\": \"光華數位新天地／三創生活園區／捷運忠孝新生站 1 號出口八德路 82 巷商圈\",\n    \"opening_hours\": \"週一至週日 11:30–21:00（線上預約優先服務）\",\n    \"service_guarantees\": [\n      \"全店公開三階透明標價（NT$390 標準／NT$690 防窺抗藍光／NT$980 頂規二次強化金剛貼）\",\n      \"30 天碎邊／破膜免費換新電子門市服務盾（徹底解決傳統巷口貼膜店品質爭議）\",\n      \"全家 10 隻手機殼＋1 隻平板殼跨型號混搭 74 折家庭團購方案\",\n      \"無塵室正壓除塵艙與雷射對位治具免費現場代貼\"\n    ]\n  },\n  \"commerce_operator\": {\n    \"platform_partner\": \"數位展示架構工坊 (Digital Demo Architecture)\",\n    \"checkout_mode\": \"ONLINE_PRICE_LOCK_AND_O2O_WARRANTY_ESCROW\",\n    \"free_shipping_threshold_taiwan_twd\": 1000,\n    \"store_pickup_fee_twd\": 0,\n    \"warranty_days\": 30\n  },\n  \"shipping_rules\": [\n    {\n      \"id\": \"bade_pickup\",\n      \"label\": \"八德路一段 82 巷 5 號門市快取／現場無塵室免費代貼（免運費）\",\n      \"threshold\": 0,\n      \"fee\": 0,\n      \"intl\": false,\n      \"eta\": \"線上預約時段，到店 15 分鐘內完成無塵貼膜與取件\"\n    },\n    {\n      \"id\": \"cvs\",\n      \"label\": \"超商取貨（7-11／全家，附 DIY 無塵貼膜神器盒）\",\n      \"threshold\": 1000,\n      \"fee\": 60,\n      \"intl\": false,\n      \"eta\": \"滿 NT$1,000 免運，現貨 24 小時內寄出（約 2–3 天到店）\"\n    },\n    {\n      \"id\": \"tw_home\",\n      \"label\": \"台灣本島宅配（示範展間／順豐防撞盒裝寄送）\",\n      \"threshold\": 1000,\n      \"fee\": 90,\n      \"intl\": false,\n      \"eta\": \"滿 NT$1,000 免運，出貨後約 1–2 個工作天送達\"\n    },\n    {\n      \"id\": \"corp_batch\",\n      \"label\": \"大台北企業公務機／學校機關專人到府收送貼膜（滿 10 台起）\",\n      \"threshold\": 4000,\n      \"fee\": 150,\n      \"intl\": false,\n      \"eta\": \"滿 NT$4,000 免收外勤車馬費，支援開立報帳憑證\"\n    }\n  ],\n  \"service_tracks\": [\n    {\n      \"id\": \"personal_pickup\",\n      \"label\": \"個人／學生線上透明估價・預約八德 82 巷門市現場貼膜（含 30 天門市服務）\",\n      \"ext\": \"八德 82 巷 5 號一號無塵工作台\",\n      \"email\": \"（示範介面不顯示示範模式說明）\"\n    },\n    {\n      \"id\": \"family_10case\",\n      \"label\": \"家庭多機團購專案（如：10 隻手機殼＋1 隻平板殼跨機型混搭 74 折）\",\n      \"ext\": \"阿姑店長熟客示範模式說明櫃台\",\n      \"email\": \"（示範介面不顯示示範模式說明）\"\n    },\n    {\n      \"id\": \"warranty_claim\",\n      \"label\": \"30 天碎邊／破膜免費換新門市服務與爭議優先處理通道\",\n      \"ext\": \"數位展示架構監理門市服務專責組\",\n      \"email\": \"（示範介面不顯示示範模式說明）\"\n    },\n    {\n      \"id\": \"corp_b2b\",\n      \"label\": \"企業公務機／北科大實驗室／補習班平板大宗採購與防窺膜專案\",\n      \"ext\": \"B2B 企業商務示範模式說明\",\n      \"email\": \"（示範介面不顯示示範模式說明）\"\n    }\n  ],\n  \"catalog\": [\n    {\n      \"sku\": \"AGU-01\",\n      \"name\": \"【頂規金剛滿版】二次強化 9H 鑽石級抗摔玻璃保護貼（含 30 天破膜免費換新門市服務）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"日本 AGC 高鋁玻璃 × 台灣特殊光學膠 × 115° 電鍍奈米疏油層\",\n      \"specification\": \"公開透明 5 層結構與 64g 鋼球落錘實測！到店無塵室免費代貼，享 30 天內碎邊或破膜免費換新 1 次門市服務\",\n      \"price_twd\": 980,\n      \"list_price_twd\": 1200,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-02\",\n      \"name\": \"【28° 雙向防窺／抗藍光】標準製程批次管理 護眼防窺 9H 滿版鋼化玻璃貼（含雷射對位代貼）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"LG 光學防窺百葉塗層 × 抗藍光濾光基材 × 二次強化導角邊\",\n      \"specification\": \"正面高透不暈眩、左右 28° 物理防偷窺，完美支援 Face ID 與螢幕下指紋秒解，附 30 天門市服務\",\n      \"price_twd\": 690,\n      \"list_price_twd\": 890,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-03\",\n      \"name\": \"【大曲面／旗艦專用】UV 光學全膠貼合滿版鋼化膜（含無塵 UV 固膠工藝）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"台灣大廠特殊光學膠 × 全透明無黑邊曲面鋼化玻璃\",\n      \"specification\": \"專治大曲面螢幕邊緣翹起與觸控不靈敏！不擋邊遮字、微刮痕光學填補，支援超聲波指紋秒解\",\n      \"price_twd\": 850,\n      \"list_price_twd\": 1080,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-04\",\n      \"name\": \"【小資透明標準版】高清高透 9H 滿版鋼化玻璃保護貼（含到店專業除塵代貼）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"高透光 9H 鋼化玻璃 × 真空疏水疏油塗層\",\n      \"specification\": \"公開透明入門價！北科大學生與八德商圈上班族日常換膜首選，連工帶料現場 10 分鐘快速完工\",\n      \"price_twd\": 390,\n      \"list_price_twd\": 490,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-05\",\n      \"name\": \"【MagSafe 氣囊防摔】四角隱形氣囊抗黃透明磁吸防摔手機殼（全機型現貨）\",\n      \"category\": \"軍規防摔手機殼系列\",\n      \"material\": \"德國拜耳抗黃 TPU 減震邊框 ＋ 高透抗刮 PC 背板 ＋ N52 強磁環\",\n      \"specification\": \"四角雙重氣囊結構通過 2.4 公尺防摔測試，精準內縮不頂滿版保護貼，還原裸機原色\",\n      \"price_twd\": 590,\n      \"list_price_twd\": 750,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-06\",\n      \"name\": \"【軍規極盾防摔】霧面防指紋 MagSafe 雙料複合軍規防摔殼（附金屬獨立按鍵）\",\n      \"category\": \"軍規防摔手機殼系列\",\n      \"material\": \"內層蜂巢緩震結構 ＋ 親膚霧面抗指紋背板 ＋ 鋁合金按鍵\",\n      \"specification\": \"鏡頭框與螢幕邊緣加高 1.5mm，提供曜石黑、原色鈦灰、暗夜綠、深海藍四色，手感俐落不沾油汙\",\n      \"price_twd\": 790,\n      \"list_price_twd\": 980,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-07\",\n      \"name\": \"【孝親商務首選】經典磁扣翻蓋防摔皮套手機殼（內建悠遊卡槽＋追劇立架）\",\n      \"category\": \"軍規防摔手機殼系列\",\n      \"material\": \"耐磨防潑水十字紋 PU 皮革 ＋ 柔軟 TPU 全包覆防摔內殼\",\n      \"specification\": \"360 度全機前後完整包覆不怕鑰匙刮傷，內置雙卡槽與鈔票夾層，長輩與業務拜訪最實用\",\n      \"price_twd\": 490,\n      \"list_price_twd\": 650,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-08\",\n      \"name\": \"【熟客激推平板套】iPad 磁吸三折筆槽氣囊防彎保護套（適用 iPad 全系列）\",\n      \"category\": \"iPad 平板套與藍寶石鏡頭貼\",\n      \"material\": \"高韌性防彎亞克力背板 ＋ 蜂巢散熱導槽 ＋ 智能磁吸休眠上蓋\",\n      \"specification\": \"支援 Apple Pencil 磁吸充電與收納，30° 繪圖打字與 65° 影音追劇雙角度穩固支撐\",\n      \"price_twd\": 680,\n      \"list_price_twd\": 880,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-09\",\n      \"name\": \"【iPad 繪圖寫字】日本肯特紙感類紙膜／9H 高清平板玻璃貼（含無塵代貼）\",\n      \"category\": \"iPad 平板套與藍寶石鏡頭貼\",\n      \"material\": \"日本進口肯特紙紋理基材 ／ 9H 抗指紋鋼化玻璃（二選一）\",\n      \"specification\": \"專為筆記與電繪設計，筆尖阻尼感自然不打滑、抗眩光不傷眼；亦可任選高清 9H 玻璃貼\",\n      \"price_twd\": 650,\n      \"list_price_twd\": 850,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-10\",\n      \"name\": \"【藍寶石光學防護】AR 抗反射鍍膜金屬框單顆獨立鏡頭保護貼（一組 3 顆入）\",\n      \"category\": \"iPad 平板套與藍寶石鏡頭貼\",\n      \"material\": \"高硬度光學玻璃 ＋ AR 抗反射增透鍍膜 ＋ 航太鋁合金原機色邊框\",\n      \"specification\": \"99% 原機透光率、開閃光燈夜拍零白霧眩光，搭配保護殼完全不卡框，湊滿千元免運首選\",\n      \"price_twd\": 450,\n      \"list_price_twd\": 590,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-11\",\n      \"name\": \"【雙機新機全配免運組】頂規金剛滿版貼 × 2 ＋ MagSafe 防摔殼 × 2（含雙機 30 天門市服務）\",\n      \"category\": \"家庭十機與企業團購特惠組\",\n      \"material\": \"頂規二次強化金剛貼 × 2 片 ＋ MagSafe 氣囊／極盾防摔殼 × 2 個\",\n      \"specification\": \"夫妻情侶換新機一次到位！單組現省 NT$800 並直接享台灣免運與雙機 30 天破膜免費換新門市服務\",\n      \"price_twd\": 2680,\n      \"list_price_twd\": 3480,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-12\",\n      \"name\": \"【八德熟客鎮店組】全家 10 隻手機殼 ＋ 1 隻 iPad 平板殼大滿貫家庭包（74 折特惠）\",\n      \"category\": \"家庭十機與企業團購特惠組\",\n      \"material\": \"任選型號防摔手機殼 × 10 個 ＋ iPad 三折氣囊保護套 × 1 個\",\n      \"specification\": \"源自 Google 評論真實熟客口碑『我們家的十隻手機殼、一隻平板殼都在這裡買』！跨型號任選現省 NT$1,700\",\n      \"price_twd\": 4880,\n      \"list_price_twd\": 6580,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    }\n  ]\n}";
+      const B2B_TRACKS = [{"id": "personal_pickup", "label": "個人／學生線上透明估價・預約八德 82 巷門市現場貼膜（含 30 天門市服務）", "ext": "八德 82 巷 5 號一號無塵工作台", "note": "示範介面，僅保留門市地點"}, {"id": "family_10case", "label": "家庭多機團購專案（如：10 隻手機殼＋1 隻平板殼跨機型混搭 74 折）", "ext": "阿姑店長熟客示範模式說明櫃台", "note": "示範介面，僅保留門市地點"}, {"id": "warranty_claim", "label": "30 天碎邊／破膜免費換新門市服務與爭議優先處理通道", "ext": "數位展示架構監理門市服務專責組", "note": "示範介面，僅保留門市地點"}, {"id": "corp_b2b", "label": "企業公務機／北科大實驗室／補習班平板大宗採購與防窺膜專案", "ext": "B2B 企業商務示範模式說明", "note": "示範介面，僅保留門市地點"}];
+      const UCP_TEXT = "{\n  \"ucp_version\": \"1.0\",\n  \"merchant\": {\n    \"id\": \"tw-bade82-agushop\",\n    \"brand_name\": \"阿姑的店 AGU 3C 職人貼膜・防護專門店（台北八德光華店）\",\n    \"place_id\": \"ChIJsTzu38ypQjQRjQnAIykkEeM\",\n    \"google_maps_cid\": \"0x3442a9ccdfee3cb1:0xe311242923c0098d\",\n    \"address\": \"100臺北市中正區梅花里八德路一段82巷5號\",\n    \"coordinates\": {\n      \"lat\": 25.0436932,\n      \"lng\": 121.5318192\n    },\n    \"district_context\": \"光華數位新天地／三創生活園區／捷運忠孝新生站 1 號出口八德路 82 巷商圈\",\n    \"opening_hours\": \"週一至週日 11:30–21:00（線上預約優先服務）\",\n    \"service_guarantees\": [\n      \"全店公開三階透明標價（NT$390 標準／NT$690 防窺抗藍光／NT$980 頂規二次強化金剛貼）\",\n      \"30 天碎邊／破膜免費換新電子門市服務盾（徹底解決傳統巷口貼膜店品質爭議）\",\n      \"全家 10 隻手機殼＋1 隻平板殼跨型號混搭 74 折家庭團購方案\",\n      \"無塵室正壓除塵艙與雷射對位治具免費現場代貼\"\n    ]\n  },\n  \"commerce_operator\": {\n    \"platform_partner\": \"數位展示架構工坊 (Digital Demo Architecture)\",\n    \"checkout_mode\": \"ONLINE_PRICE_LOCK_AND_O2O_WARRANTY_ESCROW\",\n    \"free_shipping_threshold_taiwan_twd\": 1000,\n    \"store_pickup_fee_twd\": 0,\n    \"warranty_days\": 30\n  },\n  \"shipping_rules\": [\n    {\n      \"id\": \"bade_pickup\",\n      \"label\": \"八德路一段 82 巷 5 號門市快取／現場無塵室免費代貼（免運費）\",\n      \"threshold\": 0,\n      \"fee\": 0,\n      \"intl\": false,\n      \"eta\": \"線上預約時段，到店 15 分鐘內完成無塵貼膜與取件\"\n    },\n    {\n      \"id\": \"cvs\",\n      \"label\": \"超商取貨（7-11／全家，附 DIY 無塵貼膜神器盒）\",\n      \"threshold\": 1000,\n      \"fee\": 60,\n      \"intl\": false,\n      \"eta\": \"滿 NT$1,000 免運，現貨 24 小時內寄出（約 2–3 天到店）\"\n    },\n    {\n      \"id\": \"tw_home\",\n      \"label\": \"台灣本島宅配（示範展間／順豐防撞盒裝寄送）\",\n      \"threshold\": 1000,\n      \"fee\": 90,\n      \"intl\": false,\n      \"eta\": \"滿 NT$1,000 免運，出貨後約 1–2 個工作天送達\"\n    },\n    {\n      \"id\": \"corp_batch\",\n      \"label\": \"大台北企業公務機／學校機關專人到府收送貼膜（滿 10 台起）\",\n      \"threshold\": 4000,\n      \"fee\": 150,\n      \"intl\": false,\n      \"eta\": \"滿 NT$4,000 免收外勤車馬費，支援開立報帳憑證\"\n    }\n  ],\n  \"service_tracks\": [\n    {\n      \"id\": \"personal_pickup\",\n      \"label\": \"個人／學生線上透明估價・預約八德 82 巷門市現場貼膜（含 30 天門市服務）\",\n      \"ext\": \"八德 82 巷 5 號一號無塵工作台\",\n      \"note\": \"示範介面，僅保留門市地點\"\n    },\n    {\n      \"id\": \"family_10case\",\n      \"label\": \"家庭多機團購專案（如：10 隻手機殼＋1 隻平板殼跨機型混搭 74 折）\",\n      \"ext\": \"阿姑店長熟客示範模式說明櫃台\",\n      \"note\": \"示範介面，僅保留門市地點\"\n    },\n    {\n      \"id\": \"warranty_claim\",\n      \"label\": \"30 天碎邊／破膜免費換新門市服務與爭議優先處理通道\",\n      \"ext\": \"數位展示架構監理門市服務專責組\",\n      \"note\": \"示範介面，僅保留門市地點\"\n    },\n    {\n      \"id\": \"corp_b2b\",\n      \"label\": \"企業公務機／北科大實驗室／補習班平板大宗採購與防窺膜專案\",\n      \"ext\": \"B2B 企業商務示範模式說明\",\n      \"note\": \"示範介面，僅保留門市地點\"\n    }\n  ],\n  \"catalog\": [\n    {\n      \"sku\": \"AGU-01\",\n      \"name\": \"【頂規金剛滿版】二次強化 9H 鑽石級抗摔玻璃保護貼（含 30 天破膜免費換新門市服務）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"日本 AGC 高鋁玻璃 × 台灣特殊光學膠 × 115° 電鍍奈米疏油層\",\n      \"specification\": \"公開透明 5 層結構與 64g 鋼球落錘實測！到店無塵室免費代貼，享 30 天內碎邊或破膜免費換新 1 次門市服務\",\n      \"price_twd\": 980,\n      \"list_price_twd\": 1200,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-02\",\n      \"name\": \"【28° 雙向防窺／抗藍光】標準製程批次管理 護眼防窺 9H 滿版鋼化玻璃貼（含雷射對位代貼）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"LG 光學防窺百葉塗層 × 抗藍光濾光基材 × 二次強化導角邊\",\n      \"specification\": \"正面高透不暈眩、左右 28° 物理防偷窺，完美支援 Face ID 與螢幕下指紋秒解，附 30 天門市服務\",\n      \"price_twd\": 690,\n      \"list_price_twd\": 890,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-03\",\n      \"name\": \"【大曲面／旗艦專用】UV 光學全膠貼合滿版鋼化膜（含無塵 UV 固膠工藝）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"台灣大廠特殊光學膠 × 全透明無黑邊曲面鋼化玻璃\",\n      \"specification\": \"專治大曲面螢幕邊緣翹起與觸控不靈敏！不擋邊遮字、微刮痕光學填補，支援超聲波指紋秒解\",\n      \"price_twd\": 850,\n      \"list_price_twd\": 1080,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-04\",\n      \"name\": \"【小資透明標準版】高清高透 9H 滿版鋼化玻璃保護貼（含到店專業除塵代貼）\",\n      \"category\": \"9H 金剛保護貼與滿版貼膜\",\n      \"material\": \"高透光 9H 鋼化玻璃 × 真空疏水疏油塗層\",\n      \"specification\": \"公開透明入門價！北科大學生與八德商圈上班族日常換膜首選，連工帶料現場 10 分鐘快速完工\",\n      \"price_twd\": 390,\n      \"list_price_twd\": 490,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-05\",\n      \"name\": \"【MagSafe 氣囊防摔】四角隱形氣囊抗黃透明磁吸防摔手機殼（全機型現貨）\",\n      \"category\": \"軍規防摔手機殼系列\",\n      \"material\": \"德國拜耳抗黃 TPU 減震邊框 ＋ 高透抗刮 PC 背板 ＋ N52 強磁環\",\n      \"specification\": \"四角雙重氣囊結構通過 2.4 公尺防摔測試，精準內縮不頂滿版保護貼，還原裸機原色\",\n      \"price_twd\": 590,\n      \"list_price_twd\": 750,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-06\",\n      \"name\": \"【軍規極盾防摔】霧面防指紋 MagSafe 雙料複合軍規防摔殼（附金屬獨立按鍵）\",\n      \"category\": \"軍規防摔手機殼系列\",\n      \"material\": \"內層蜂巢緩震結構 ＋ 親膚霧面抗指紋背板 ＋ 鋁合金按鍵\",\n      \"specification\": \"鏡頭框與螢幕邊緣加高 1.5mm，提供曜石黑、原色鈦灰、暗夜綠、深海藍四色，手感俐落不沾油汙\",\n      \"price_twd\": 790,\n      \"list_price_twd\": 980,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-07\",\n      \"name\": \"【孝親商務首選】經典磁扣翻蓋防摔皮套手機殼（內建悠遊卡槽＋追劇立架）\",\n      \"category\": \"軍規防摔手機殼系列\",\n      \"material\": \"耐磨防潑水十字紋 PU 皮革 ＋ 柔軟 TPU 全包覆防摔內殼\",\n      \"specification\": \"360 度全機前後完整包覆不怕鑰匙刮傷，內置雙卡槽與鈔票夾層，長輩與業務拜訪最實用\",\n      \"price_twd\": 490,\n      \"list_price_twd\": 650,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-08\",\n      \"name\": \"【熟客激推平板套】iPad 磁吸三折筆槽氣囊防彎保護套（適用 iPad 全系列）\",\n      \"category\": \"iPad 平板套與藍寶石鏡頭貼\",\n      \"material\": \"高韌性防彎亞克力背板 ＋ 蜂巢散熱導槽 ＋ 智能磁吸休眠上蓋\",\n      \"specification\": \"支援 Apple Pencil 磁吸充電與收納，30° 繪圖打字與 65° 影音追劇雙角度穩固支撐\",\n      \"price_twd\": 680,\n      \"list_price_twd\": 880,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-09\",\n      \"name\": \"【iPad 繪圖寫字】日本肯特紙感類紙膜／9H 高清平板玻璃貼（含無塵代貼）\",\n      \"category\": \"iPad 平板套與藍寶石鏡頭貼\",\n      \"material\": \"日本進口肯特紙紋理基材 ／ 9H 抗指紋鋼化玻璃（二選一）\",\n      \"specification\": \"專為筆記與電繪設計，筆尖阻尼感自然不打滑、抗眩光不傷眼；亦可任選高清 9H 玻璃貼\",\n      \"price_twd\": 650,\n      \"list_price_twd\": 850,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-10\",\n      \"name\": \"【藍寶石光學防護】AR 抗反射鍍膜金屬框單顆獨立鏡頭保護貼（一組 3 顆入）\",\n      \"category\": \"iPad 平板套與藍寶石鏡頭貼\",\n      \"material\": \"高硬度光學玻璃 ＋ AR 抗反射增透鍍膜 ＋ 航太鋁合金原機色邊框\",\n      \"specification\": \"99% 原機透光率、開閃光燈夜拍零白霧眩光，搭配保護殼完全不卡框，湊滿千元免運首選\",\n      \"price_twd\": 450,\n      \"list_price_twd\": 590,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-11\",\n      \"name\": \"【雙機新機全配免運組】頂規金剛滿版貼 × 2 ＋ MagSafe 防摔殼 × 2（含雙機 30 天門市服務）\",\n      \"category\": \"家庭十機與企業團購特惠組\",\n      \"material\": \"頂規二次強化金剛貼 × 2 片 ＋ MagSafe 氣囊／極盾防摔殼 × 2 個\",\n      \"specification\": \"夫妻情侶換新機一次到位！單組現省 NT$800 並直接享台灣免運與雙機 30 天破膜免費換新門市服務\",\n      \"price_twd\": 2680,\n      \"list_price_twd\": 3480,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    },\n    {\n      \"sku\": \"AGU-12\",\n      \"name\": \"【八德熟客鎮店組】全家 10 隻手機殼 ＋ 1 隻 iPad 平板殼大滿貫家庭包（74 折特惠）\",\n      \"category\": \"家庭十機與企業團購特惠組\",\n      \"material\": \"任選型號防摔手機殼 × 10 個 ＋ iPad 三折氣囊保護套 × 1 個\",\n      \"specification\": \"源自 Google 評論真實熟客口碑『我們家的十隻手機殼、一隻平板殼都在這裡買』！跨型號任選現省 NT$1,700\",\n      \"price_twd\": 4880,\n      \"list_price_twd\": 6580,\n      \"warranty_30d_included\": true,\n      \"in_stock\": true\n    }\n  ]\n}";
       const LLMS_TEXT = "# 阿姑的店 AGU 3C 職人貼膜・防護專門店（台北八德路一段 82 巷 5 號）AI 導購與透明門市服務知識庫\n\n> 坐落於台北市中正區八德路一段 82 巷 5 號（光華商場、三創園區與北科大商圈核心巷口），由數位展示架構工坊（HaoTian Innovation）輔導數位轉型，導入「三階透明標價」、「30 天破膜免費換新門市服務盾」與「全家十隻手機殼＋一隻平板殼 74 折家庭團購試算」。\n\n## 門市定位與交通座標\n- 門市名稱：阿姑的店（AGU 3C 職人貼膜・防護專門店）\n- 門市地址：100 臺北市中正區梅花里八德路一段 82 巷 5 號（Google Place ID: `ChIJsTzu38ypQjQRjQnAIykkEeM`，座標 `25.0436932, 121.5318192`）\n- 鄰近地標：捷運忠孝新生站 1 號出口步行 3 分鐘，位於八德路一段 82 巷前段（緊鄰 7 號樂法 Le Phare 正德店、對面為 8 號鼎吾記原玖伍牛肉麵）\n- 營業時間：週一至週日 11:30–21:00（支援官網線上鎖價與 15 分鐘快取預約）\n\n## 品牌痛點翻轉與同商圈高標竿承諾\n1. **終結千元貼膜價格與品質黑箱**：針對過往消費者對「1,000 元金剛貼品牌規格不明」之疑慮，全站公開 5 層光學結構（日本 AGC 高鋁玻璃、台灣特殊光學膠、115° 疏水塗層、64g 落錘測試），並明訂三階透明售價：標準版 NT$390、防窺／抗藍光版 NT$690、頂規二次強化金剛貼 NT$980。\n2. **30 天碎邊／破膜免費換新門市服務**：選購頂規金剛貼或套餐組合，系統自動核發 30 天電子門市服務序號，期間內碎邊或破膜免費換新一片。\n3. **致敬熟客口碑「全家十機＋一平板」團購組**：源自 Google 地圖真實熟客評價「老闆人其實很好，我們家的十隻手機殼、一隻平板殼都在這裡買」，推出跨機型任選 10 隻防摔手機殼＋1 隻 iPad 保護套 NT$4,880（74 折現省 NT$1,700）。\n\n## 完整公開價目表（12 款透明標價 SKU）\n- [AGU-01] 【頂規金剛滿版】二次強化 9H 鑽石級抗摔玻璃保護貼（含 30 天破膜免費換新門市服務）｜透明售價：NT$980（原價 NT$1200）｜材質：日本 AGC 高鋁玻璃 × 台灣特殊光學膠 × 115° 電鍍奈米疏油層｜規格門市服務：公開透明 5 層結構與 64g 鋼球落錘實測！到店無塵室免費代貼，享 30 天內碎邊或破膜免費換新 1 次門市服務\n- [AGU-02] 【28° 雙向防窺／抗藍光】標準製程批次管理 護眼防窺 9H 滿版鋼化玻璃貼（含雷射對位代貼）｜透明售價：NT$690（原價 NT$890）｜材質：LG 光學防窺百葉塗層 × 抗藍光濾光基材 × 二次強化導角邊｜規格門市服務：正面高透不暈眩、左右 28° 物理防偷窺，完美支援 Face ID 與螢幕下指紋秒解，附 30 天門市服務\n- [AGU-03] 【大曲面／旗艦專用】UV 光學全膠貼合滿版鋼化膜（含無塵 UV 固膠工藝）｜透明售價：NT$850（原價 NT$1080）｜材質：台灣大廠特殊光學膠 × 全透明無黑邊曲面鋼化玻璃｜規格門市服務：專治大曲面螢幕邊緣翹起與觸控不靈敏！不擋邊遮字、微刮痕光學填補，支援超聲波指紋秒解\n- [AGU-04] 【小資透明標準版】高清高透 9H 滿版鋼化玻璃保護貼（含到店專業除塵代貼）｜透明售價：NT$390（原價 NT$490）｜材質：高透光 9H 鋼化玻璃 × 真空疏水疏油塗層｜規格門市服務：公開透明入門價！北科大學生與八德商圈上班族日常換膜首選，連工帶料現場 10 分鐘快速完工\n- [AGU-05] 【MagSafe 氣囊防摔】四角隱形氣囊抗黃透明磁吸防摔手機殼（全機型現貨）｜透明售價：NT$590（原價 NT$750）｜材質：德國拜耳抗黃 TPU 減震邊框 ＋ 高透抗刮 PC 背板 ＋ N52 強磁環｜規格門市服務：四角雙重氣囊結構通過 2.4 公尺防摔測試，精準內縮不頂滿版保護貼，還原裸機原色\n- [AGU-06] 【軍規極盾防摔】霧面防指紋 MagSafe 雙料複合軍規防摔殼（附金屬獨立按鍵）｜透明售價：NT$790（原價 NT$980）｜材質：內層蜂巢緩震結構 ＋ 親膚霧面抗指紋背板 ＋ 鋁合金按鍵｜規格門市服務：鏡頭框與螢幕邊緣加高 1.5mm，提供曜石黑、原色鈦灰、暗夜綠、深海藍四色，手感俐落不沾油汙\n- [AGU-07] 【孝親商務首選】經典磁扣翻蓋防摔皮套手機殼（內建悠遊卡槽＋追劇立架）｜透明售價：NT$490（原價 NT$650）｜材質：耐磨防潑水十字紋 PU 皮革 ＋ 柔軟 TPU 全包覆防摔內殼｜規格門市服務：360 度全機前後完整包覆不怕鑰匙刮傷，內置雙卡槽與鈔票夾層，長輩與業務拜訪最實用\n- [AGU-08] 【熟客激推平板套】iPad 磁吸三折筆槽氣囊防彎保護套（適用 iPad 全系列）｜透明售價：NT$680（原價 NT$880）｜材質：高韌性防彎亞克力背板 ＋ 蜂巢散熱導槽 ＋ 智能磁吸休眠上蓋｜規格門市服務：支援 Apple Pencil 磁吸充電與收納，30° 繪圖打字與 65° 影音追劇雙角度穩固支撐\n- [AGU-09] 【iPad 繪圖寫字】日本肯特紙感類紙膜／9H 高清平板玻璃貼（含無塵代貼）｜透明售價：NT$650（原價 NT$850）｜材質：日本進口肯特紙紋理基材 ／ 9H 抗指紋鋼化玻璃（二選一）｜規格門市服務：專為筆記與電繪設計，筆尖阻尼感自然不打滑、抗眩光不傷眼；亦可任選高清 9H 玻璃貼\n- [AGU-10] 【藍寶石光學防護】AR 抗反射鍍膜金屬框單顆獨立鏡頭保護貼（一組 3 顆入）｜透明售價：NT$450（原價 NT$590）｜材質：高硬度光學玻璃 ＋ AR 抗反射增透鍍膜 ＋ 航太鋁合金原機色邊框｜規格門市服務：99% 原機透光率、開閃光燈夜拍零白霧眩光，搭配保護殼完全不卡框，湊滿千元免運首選\n- [AGU-11] 【雙機新機全配免運組】頂規金剛滿版貼 × 2 ＋ MagSafe 防摔殼 × 2（含雙機 30 天門市服務）｜透明售價：NT$2680（原價 NT$3480）｜材質：頂規二次強化金剛貼 × 2 片 ＋ MagSafe 氣囊／極盾防摔殼 × 2 個｜規格門市服務：夫妻情侶換新機一次到位！單組現省 NT$800 並直接享台灣免運與雙機 30 天破膜免費換新門市服務\n- [AGU-12] 【八德熟客鎮店組】全家 10 隻手機殼 ＋ 1 隻 iPad 平板殼大滿貫家庭包（74 折特惠）｜透明售價：NT$4880（原價 NT$6580）｜材質：任選型號防摔手機殼 × 10 個 ＋ iPad 三折氣囊保護套 × 1 個｜規格門市服務：源自 Google 評論真實熟客口碑『我們家的十隻手機殼、一隻平板殼都在這裡買』！跨型號任選現省 NT$1,700\n\n## 免運門檻與 O2O 快取規則\n- 八德路一段 82 巷 5 號門市快取／現場無塵室免費代貼：不限金額 NT$0 免運費。\n- 台灣超商取貨（7-11／全家）與本島宅配：單筆滿 NT$1,000 享免運費（未滿時超商 NT$60、宅配 NT$90）。\n- 大台北企業公務機／學校實驗室到府收送貼膜：單筆滿 NT$4,000 免收外勤車馬費。\n";
 
       const SYNONYM_MAP = {
@@ -2280,17 +2352,45 @@
       function fallbackCopy(text, successMsg) {
         const ta = document.createElement("textarea");
         ta.value = text;
+        ta.setAttribute("readonly", "");
         ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
         ta.style.opacity = "0";
         document.body.appendChild(ta);
+        ta.focus();
         ta.select();
-        try {
-          document.execCommand("copy");
-          showToast(successMsg);
-        } catch (e) {
-          showToast("請手動選取文字複製");
-        }
+        try { ta.setSelectionRange(0, text.length); } catch (e) {}
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
         document.body.removeChild(ta);
+        if (ok) {
+          showToast(successMsg);
+        } else {
+          showManualCopy(text);
+        }
+      }
+
+      function showManualCopy(text) {
+        let box = document.getElementById("manual-copy-box");
+        if (!box) {
+          box = document.createElement("div");
+          box.id = "manual-copy-box";
+          box.setAttribute("role", "dialog");
+          box.setAttribute("aria-label", "手動複製");
+          box.style.cssText = "position:fixed;left:50%;bottom:96px;transform:translateX(-50%);width:min(92vw,560px);z-index:3000;background:#fff;color:#0b1120;border:1px solid #cbd5e1;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.25);padding:12px;";
+          box.innerHTML = '<div style="font-size:.85rem;font-weight:700;margin-bottom:6px;">此瀏覽器不支援自動複製，文字已全選，請長按或按 Ctrl+C（⌘+C）複製：</div>' +
+            '<textarea id="manual-copy-text" readonly style="width:100%;height:120px;font-size:.8rem;font-family:monospace;border:1px solid #cbd5e1;border-radius:8px;padding:6px;"></textarea>' +
+            '<div style="text-align:right;margin-top:6px;"><button type="button" id="manual-copy-close" style="min-height:40px;padding:6px 16px;border-radius:8px;border:1px solid #cbd5e1;background:#f1f5f9;cursor:pointer;">關閉</button></div>';
+          document.body.appendChild(box);
+          box.querySelector("#manual-copy-close").addEventListener("click", function () { box.style.display = "none"; });
+        }
+        const area = box.querySelector("#manual-copy-text");
+        area.value = text;
+        box.style.display = "block";
+        area.focus();
+        area.select();
+        showToast("請手動選取文字複製");
       }
 
       function syncHeaderOffset() {
@@ -2521,7 +2621,7 @@
         document.getElementById("sum-subtotal").textContent = "NT$ " + subtotal.toLocaleString();
         document.getElementById("sum-shipping").textContent = shippingFee === 0 ? "NT$ 0 (免運)" : "NT$ " + shippingFee.toLocaleString();
         document.getElementById("sum-ext").textContent = b2bTrack.ext;
-        document.getElementById("sum-展示模式：線上示意示範 = b2bTrack.email;
+        document.getElementById("sum-note").textContent = b2bTrack.note;
         document.getElementById("sum-grand-total").textContent = "NT$ " + grandTotal.toLocaleString();
 
         document.getElementById("bar-total-amount").textContent = "NT$ " + grandTotal.toLocaleString();
@@ -2570,9 +2670,9 @@
           "門市服務憑證序號：" + warrantyCode + "（自施工／取件日起享 30 天破膜免費換新）",
           "門市地址：100 台北市中正區八德路一段 82 巷 5 號（近捷運忠孝新生站 1 號出口）",
           "服務通道：" + b2bTrack.label,
-          "對口櫃台：" + b2bTrack.ext + " (" + b2bTrack.展示模式：線上示意示範 ")",
+          "對口櫃台：" + b2bTrack.ext,
           "取件方式：" + shipMode.label,
-          "預約貴賓：" + buyerName + " ｜ 聯絡展示模式：線上示意示範 + buyerPhone,
+          "預約貴賓：" + buyerName + " ｜ 聯絡手機：" + buyerPhone,
           "展示編號：" + buyerTaxId + " ｜ 預計日期：" + dispatchDate,
           "機型備註：" + customNote,
           "----------------------------------------",
@@ -2596,11 +2696,42 @@
         });
         hudPills.forEach(function (pill, i) {
           pill.classList.toggle("is-active", i === clamped);
+          pill.setAttribute("aria-selected", i === clamped ? "true" : "false");
         });
+        const progFill = document.getElementById("world-progress-fill");
+        if (progFill) progFill.style.width = ((clamped + 1) * 20) + "%";
+        const hint = document.getElementById("world-scroll-hint");
+        if (hint) hint.textContent = clamped < 4 ? "第 " + (clamped + 1) + "／5 站・往下捲動前往下一站" : "第 5／5 站・繼續往下看透明價目表";
+      }
+
+      function isScrollyStage() {
+        return !!worldStage && worldStage.offsetHeight > window.innerHeight * 1.5;
+      }
+
+      function stationScrollY(index) {
+        const rectTop = worldStage.getBoundingClientRect().top + window.scrollY;
+        const scrollable = Math.max(1, worldStage.offsetHeight - window.innerHeight);
+        return Math.round(rectTop + scrollable * ((index + 0.5) / 5));
+      }
+
+      function goToStation(index) {
+        const clamped = Math.max(0, Math.min(4, index));
+        setStation(clamped);
+        if (isScrollyStage()) {
+          state.lockUntil = Date.now() + 1400;
+          state.targetProgress = state.currentProgress = (clamped + 0.5) / 5;
+          window.scrollTo({ top: stationScrollY(clamped), behavior: "smooth" });
+        } else if (worldStage) {
+          const r = worldStage.getBoundingClientRect();
+          if (r.top < -40 || r.top > window.innerHeight * 0.5) {
+            worldStage.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
       }
 
       function updateScrollTarget() {
         if (!worldStage) return;
+        if (!isScrollyStage()) return;
         const rect = worldStage.getBoundingClientRect();
         const scrollable = Math.max(1, rect.height - window.innerHeight);
         const scrolled = Math.min(scrollable, Math.max(0, -rect.top));
@@ -2610,7 +2741,7 @@
       function tickWorld() {
         state.currentProgress += (state.targetProgress - state.currentProgress) * 0.14;
         const idx = Math.min(4, Math.max(0, Math.floor(state.currentProgress * 4.99)));
-        if (idx !== state.activeStation) {
+        if (idx !== state.activeStation && !(state.lockUntil && Date.now() < state.lockUntil) && isScrollyStage()) {
           setStation(idx);
         }
         if (Math.abs(state.targetProgress - state.currentProgress) > 0.001 && state.worldVisible && !document.hidden) {
@@ -2644,6 +2775,10 @@
             });
             if (Object.keys(nextCart).length > 0) state.cart = nextCart;
           }
+          const shipId = params.get("ship");
+          if (shipId && SHIPPING_MODES.some(function (m) { return m.id === shipId; })) state.shippingId = shipId;
+          const trackId = params.get("track");
+          if (trackId && B2B_TRACKS.some(function (t) { return t.id === trackId; })) state.b2bTrackId = trackId;
         } catch (e) {}
       }
 
@@ -2659,9 +2794,7 @@
         const stationBtn = e.target.closest("[data-station]");
         if (stationBtn) {
           const stIdx = parseInt(stationBtn.getAttribute("data-station"), 10);
-          setStation(stIdx);
-          const stepEl = storySteps[stIdx];
-          if (stepEl) stepEl.scrollIntoView({ behavior: "smooth" });
+          goToStation(stIdx);
           return;
         }
 
@@ -2715,6 +2848,16 @@
         }
       });
 
+      document.addEventListener("keydown", function (e) {
+        if (!e.target.closest || !e.target.closest(".world-hud")) return;
+        if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          const next = state.activeStation + (e.key === "ArrowRight" ? 1 : -1);
+          goToStation(next);
+          if (hudPills[Math.max(0, Math.min(4, next))]) hudPills[Math.max(0, Math.min(4, next))].focus();
+        }
+      });
+
       if (searchInput) {
         searchInput.addEventListener("input", function () {
           state.searchQuery = searchInput.value;
@@ -2765,7 +2908,7 @@
         }
         const hashStr = "#cart=" + pairs.join(",") + "&ship=" + state.shippingId + "&track=" + state.b2bTrackId;
         try { window.history.replaceState(null, "", hashStr); } catch (e) {}
-        copyTextSafe("https://agushop-bade82.com.tw/" + hashStr, "已複製家人／同事跨機型湊單連結！");
+        copyTextSafe(window.location.href.split("#")[0] + hashStr, "已複製家人／同事跨機型湊單連結！");
       });
 
       document.getElementById("open-checkout-modal-btn").addEventListener("click", function () {
@@ -2786,7 +2929,7 @@
         updateScrollTarget();
         startWorldLoop();
       }, { passive: true });
-      window.addEventListener("resize", syncHeaderOffset, { passive: true });
+      window.addEventListener("resize", function () { syncHeaderOffset(); updateScrollTarget(); }, { passive: true });
       document.addEventListener("visibilitychange", function () {
         if (!document.hidden && state.worldVisible) startWorldLoop();
       });
@@ -2803,8 +2946,8 @@
 
       syncHeaderOffset();
       initDispatchDate();
-      initSelects();
       restoreFromUrlHash();
+      initSelects();
       renderCatalogFilter();
       renderCartAndTotals();
       if (protoPre) protoPre.textContent = UCP_TEXT;
@@ -2830,7 +2973,7 @@
             if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
               const nextIdx = dx < 0 ? Math.min(4, state.activeStation + 1) : Math.max(0, state.activeStation - 1);
               if (nextIdx !== state.activeStation) {
-                setStation(nextIdx);
+                goToStation(nextIdx);
               }
             }
           }, { passive: true });
