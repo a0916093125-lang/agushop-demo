@@ -1,5 +1,35 @@
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
 User-agent: *
 Allow: /
-Allow: /llms.txt
-Allow: /.well-known/ucp
-Sitemap: https://agushop-bade82.com.tw/sitemap.xml
+
+Sitemap: https://a0916093125-lang.github.io/agushop-demo/sitemap.xml
+# AI & Agentic Commerce Discovery:
+# LLMs Context: https://a0916093125-lang.github.io/agushop-demo/llms.txt
+# UCP v1.1 Manifest: https://a0916093125-lang.github.io/agushop-demo/.well-known/ucp
+# UCP Mirror JSON: https://a0916093125-lang.github.io/agushop-demo/ucp.json

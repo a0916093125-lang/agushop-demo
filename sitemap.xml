@@ -1,21 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://agushop-bade82.com.tw/</loc>
-    <lastmod>2026-11-14</lastmod>
+    <loc>https://a0916093125-lang.github.io/agushop-demo/</loc>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://agushop-bade82.com.tw/llms.txt</loc>
-    <lastmod>2026-11-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://agushop-bade82.com.tw/.well-known/ucp</loc>
-    <lastmod>2026-11-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://a0916093125-lang.github.io/agushop-demo/assets/og-cover.jpg</image:loc>
+      <image:title>阿姑的店 AGU SHOP｜先選型號再配三件套・充電線・氮化鎵充電頭・磁吸行動電源官網</image:title>
+      <image:caption>點選 iPhone 17 Pro Max 等近十年手機筆電型號，一鍵配對專屬殼貼三件套與快充裝備</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://a0916093125-lang.github.io/agushop-demo/assets/scene-01.webp</image:loc>
+      <image:title>第1步選型號、第2步配三件套、第3步加購快充裝備之直覺門市體驗</image:title>
+      <image:caption>支援 iPhone 17 Pro Max 等直立手機均一價 NT$790 起，滿 NT$990 免運</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://a0916093125-lang.github.io/agushop-demo/assets/scene-02.webp</image:loc>
+      <image:title>主流平面機型專屬全罩靜電除塵定位艙與 AR 抗反射強化玻璃貼</image:title>
+      <image:caption>除油、平拉、滑壓靜置 20 秒輔助排氣，大幅降低貼歪與落塵機率</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://a0916093125-lang.github.io/agushop-demo/assets/scene-03.webp</image:loc>
+      <image:title>莫氏硬度 9 級人造藍寶石 AR 抗反射金屬框獨立鏡頭保護貼</image:title>
+      <image:caption>硬度高於日常石英砂塵，降低夜拍霓虹與閃光燈白霧鬼影</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://a0916093125-lang.github.io/agushop-demo/assets/scene-04.webp</image:loc>
+      <image:title>筆電四角氣囊防摔包與 295 微米極薄磁吸防窺抗藍光貼</image:title>
+      <image:caption>MacBook 與商務筆電專屬，一秒拆裝防偷窺、闔蓋平順不傷面板</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://a0916093125-lang.github.io/agushop-demo/assets/scene-05.webp</image:loc>
+      <image:title>45W/65W 氮化鎵充電頭、Qi2 磁吸行動電源加購與八德門市專人代貼</image:title>
+      <image:caption>自動對應 USB-C 或 Lightning 接孔與 Wh 飛航登機標示，滿額即享免運</image:caption>
+    </image:image>
   </url>
 </urlset>
